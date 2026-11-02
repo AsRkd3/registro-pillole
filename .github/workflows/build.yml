@@ -31,7 +31,7 @@ jobs:
         run: xcodebuild -project RegistroPillole.xcodeproj -scheme RegistroPillole -destination 'generic/platform=iOS Simulator' -derivedDataPath build/DerivedData CODE_SIGNING_ALLOWED=NO build
 
       - name: Build Apple Watch simulator app
-        run: xcodebuild -project RegistroPillole.xcodeproj -target RegistroPilloleWatch -sdk watchsimulator -derivedDataPath build/DerivedData CODE_SIGNING_ALLOWED=NO build
+        run: xcodebuild -project RegistroPillole.xcodeproj -scheme RegistroPillole -destination 'generic/platform=watchOS Simulator' -derivedDataPath build/WatchDerivedData CODE_SIGNING_ALLOWED=NO build
 
       - name: Upload simulator builds
         if: success()
@@ -40,5 +40,6 @@ jobs:
           name: Registro-Pillole-simulator-builds
           path: |
             build/DerivedData/Build/Products/Debug-iphonesimulator/RegistroPillole.app
-            build/DerivedData/Build/Products/Debug-watchsimulator/RegistroPilloleWatch.app
+            build/DerivedData/Build/Products/Debug-iphonesimulator/RegistroPillole.app/Watch/RegistroPilloleWatch.app
+            build/WatchDerivedData/Build/Products/Debug-watchsimulator/RegistroPilloleWatch.app
           if-no-files-found: warn
