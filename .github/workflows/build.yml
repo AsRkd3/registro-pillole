@@ -31,14 +31,23 @@ jobs:
         run: xcodegen generate
 
       - name: Build iPhone simulator app
-        run: xcodebuild -project RegistroPillole.xcodeproj -scheme RegistroPillole -destination 'generic/platform=iOS Simulator' -derivedDataPath build/DerivedData CODE_SIGNING_ALLOWED=NO build
+        run: xcodebuild -project RegistroPillole.xcodeproj -scheme RegistroPillole -destination 'generic/platform=iOS Simulator' -derivedDataPath build/Simulator CODE_SIGNING_ALLOWED=NO build
+
+      - name: Build iPhone and Watch for physical devices (unsigned)
+        run: xcodebuild -project RegistroPillole.xcodeproj -scheme RegistroPillole -destination 'generic/platform=iOS' -derivedDataPath build/Device CODE_SIGNING_ALLOWED=NO build
 
       - name: Upload simulator builds
         if: success()
         uses: actions/upload-artifact@v4
         with:
           name: Registro-Pillole-simulator-builds
-          path: |
-            build/DerivedData/Build/Products/Debug-iphonesimulator/RegistroPillole.app
-            build/DerivedData/Build/Products/Debug-iphonesimulator/RegistroPillole.app/PlugIns/RegistroPilloleWatch.app
-          if-no-files-found: warn
+          path: build/Simulator/Build/Products/Debug-iphonesimulator/RegistroPillole.app
+          if-no-files-found: error
+
+      - name: Upload unsigned physical-device build
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: Registro-Pillole-physical-device-unsigned
+          path: build/Device/Build/Products/Debug-iphoneos/RegistroPillole.app
+          if-no-files-found: error
