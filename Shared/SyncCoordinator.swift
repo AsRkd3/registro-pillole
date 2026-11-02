@@ -5,6 +5,7 @@ final class SyncCoordinator: NSObject, WCSessionDelegate {
     static let shared = SyncCoordinator()
 
     private weak var store: MedicationStore?
+    private var pendingMessages: [SyncMessage] = []
 
     private override init() {
         super.init()
@@ -20,11 +21,17 @@ final class SyncCoordinator: NSObject, WCSessionDelegate {
     }
 
     func send(_ message: SyncMessage) {
-        guard WCSession.isSupported(),
-              WCSession.default.activationState == .activated,
-              let data = try? JSONEncoder().encode(message)
-        else { return }
+        guard WCSession.isSupported() else { return }
 
+        guard WCSession.default.activationState == .activated else {
+            pendingMessages.append(message)
+            return
+        }
+        transfer(message)
+    }
+
+    private func transfer(_ message: SyncMessage) {
+        guard let data = try? JSONEncoder().encode(message) else { return }
         WCSession.default.transferUserInfo(["payload": data])
     }
 
@@ -34,9 +41,15 @@ final class SyncCoordinator: NSObject, WCSessionDelegate {
         guard activationState == .activated else { return }
 
         Task { @MainActor [weak self] in
-            guard let self, let store = self.store else { return }
+            guard let self else { return }
+            for message in self.pendingMessages {
+                self.transfer(message)
+            }
+            self.pendingMessages.removeAll()
+
+            guard let store = self.store else { return }
             for event in store.events {
-                self.send(.upsert(event))
+                self.transfer(.upsert(event))
             }
         }
     }
