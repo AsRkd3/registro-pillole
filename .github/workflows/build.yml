@@ -18,6 +18,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Select Xcode 26.3
+        run: sudo xcode-select -s /Applications/Xcode_26.3.app/Contents/Developer
+
       - name: Show Xcode version
         run: xcodebuild -version
 
@@ -30,7 +33,6 @@ jobs:
       - name: Build iPhone simulator app
         run: xcodebuild -project RegistroPillole.xcodeproj -scheme RegistroPillole -destination 'generic/platform=iOS Simulator' -derivedDataPath build/DerivedData CODE_SIGNING_ALLOWED=NO build
 
-
       - name: Upload simulator builds
         if: success()
         uses: actions/upload-artifact@v4
@@ -38,5 +40,5 @@ jobs:
           name: Registro-Pillole-simulator-builds
           path: |
             build/DerivedData/Build/Products/Debug-iphonesimulator/RegistroPillole.app
-            build/DerivedData/Build/Products/Debug-iphonesimulator/RegistroPillole.app/PlugIns/RegistroPilloleWatch.appex
+            build/DerivedData/Build/Products/Debug-iphonesimulator/RegistroPillole.app/PlugIns/RegistroPilloleWatch.app
           if-no-files-found: warn
