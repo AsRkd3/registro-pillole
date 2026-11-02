@@ -7,17 +7,19 @@ on:
     branches: [ main ]
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   build:
     runs-on: macos-26
+    timeout-minutes: 30
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Select Xcode
-        run: |
-          xcodebuild -version
-          xcode-select -p
+      - name: Show Xcode version
+        run: xcodebuild -version
 
       - name: Install XcodeGen
         run: brew install xcodegen
@@ -25,10 +27,18 @@ jobs:
       - name: Generate Xcode project
         run: xcodegen generate
 
-      - name: Build iOS simulator app
-        run: |
-          xcodebuild             -project RegistroPillole.xcodeproj             -scheme RegistroPillole             -sdk iphonesimulator             -configuration Debug             CODE_SIGNING_ALLOWED=NO             build
+      - name: Build iPhone simulator app
+        run: xcodebuild -project RegistroPillole.xcodeproj -scheme RegistroPillole -destination 'generic/platform=iOS Simulator' -derivedDataPath build/DerivedData CODE_SIGNING_ALLOWED=NO build
 
-      - name: Build watchOS simulator app
-        run: |
-          xcodebuild             -project RegistroPillole.xcodeproj             -target RegistroPilloleWatch             -sdk watchsimulator             -configuration Debug             CODE_SIGNING_ALLOWED=NO             build
+      - name: Build Apple Watch simulator app
+        run: xcodebuild -project RegistroPillole.xcodeproj -target RegistroPilloleWatch -sdk watchsimulator -derivedDataPath build/DerivedData CODE_SIGNING_ALLOWED=NO build
+
+      - name: Upload simulator builds
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: Registro-Pillole-simulator-builds
+          path: |
+            build/DerivedData/Build/Products/Debug-iphonesimulator/RegistroPillole.app
+            build/DerivedData/Build/Products/Debug-watchsimulator/RegistroPilloleWatch.app
+          if-no-files-found: warn
