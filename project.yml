@@ -6,6 +6,7 @@ options:
     iOS: "17.0"
     watchOS: "10.0"
   createIntermediateGroups: true
+  postGenCommand: sed -i '' -e 's|dstPath = "$(CONTENTS_FOLDER_PATH)/Watch";|dstPath = "";|' -e 's|dstSubfolderSpec = 16;|dstSubfolderSpec = 13;|' RegistroPillole.xcodeproj/project.pbxproj
 
 settings:
   base:
@@ -33,7 +34,7 @@ targets:
         SUPPORTS_MACCATALYST: NO
 
   RegistroPilloleWatch:
-    type: application
+    type: application.watchapp2
     platform: watchOS
     sources:
       - path: Shared
@@ -43,6 +44,8 @@ targets:
         PRODUCT_BUNDLE_IDENTIFIER: it.chri.registropillole.watchkitapp
         INFOPLIST_KEY_CFBundleDisplayName: Registro Pillole
         INFOPLIST_KEY_WKCompanionAppBundleIdentifier: it.chri.registropillole
+        INFOPLIST_KEY_WKWatchKitApp: YES
+        INFOPLIST_KEY_WKRunsIndependentlyOfCompanionApp: YES
         TARGETED_DEVICE_FAMILY: "4"
         SUPPORTS_MACCATALYST: NO
 
