@@ -34,7 +34,7 @@ targets:
         SUPPORTS_MACCATALYST: NO
 
   RegistroPilloleWatch:
-    type: application.watchapp2
+    type: application
     platform: watchOS
     sources:
       - path: Shared
